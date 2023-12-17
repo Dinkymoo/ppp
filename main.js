@@ -40,37 +40,42 @@ window.addEventListener("load", function () {
         this.width,
         this.height
       );
-      context.beginPath();
-      context.arc(
-        this.collisionX,
-        this.collisionY,
-        this.collisionRadius,
-        0,
-        Math.PI * 2 //full circle
-      );
-      context.save();
-      context.globalAlpha = 0.5;
-      context.fill();
-      context.restore();
-      context.stroke();
-      context.beginPath();
-      context.moveTo(this.collisionX, this.collisionY);
-      context.lineTo(this.game.mouse.x, this.game.mouse.y);
-      context.stroke();
+      if (this.game.debug) {
+        context.beginPath();
+        context.arc(
+          this.collisionX,
+          this.collisionY,
+          this.collisionRadius,
+          0,
+          Math.PI * 2 //full circle
+        );
+        context.save();
+        context.globalAlpha = 0.5;
+        context.fill();
+        context.restore();
+        context.stroke();
+        context.beginPath();
+        context.moveTo(this.collisionX, this.collisionY);
+        context.lineTo(this.game.mouse.x, this.game.mouse.y);
+        context.stroke();
+      }
     }
     update() {
       this.dx = this.game.mouse.x - this.collisionX; //mouse first
       this.dy = this.game.mouse.y - this.collisionY;
       //sprite animation
-      const angle = Math.atan2(this.dy, this.dx); //angle between player and mouse cursor in radians
-      if (angle < -1.17) this.frameY = 0;
+      const angle = Math.atan2(this.dy, this.dx); //angle between mouse(0,0) and player(x,y)
+      // radian range to make player always face the mouse
+      if (angle < -2.74 || angle > 2.74)
+        this.frameY = 6; //circle ends and starts
+      else if (angle < -1.96) this.frameY = 7;
+      else if (angle < -1.17) this.frameY = 0;
       else if (angle < -0.39) this.frameY = 1;
       else if (angle < 0.39) this.frameY = 2;
       else if (angle < 1.17) this.frameY = 3;
       else if (angle < 1.96) this.frameY = 4;
       else if (angle < 2.74) this.frameY = 5;
-      else if (angle < -2.74 || angle > 2.74) this.frameY = 6;
-      else if (angle < -1.96) this.frameY = 7;
+
       const distance = Math.hypot(this.dy, this.dx);
       if (distance > this.speedModifier) {
         this.speedX = this.dx / distance || 0;
@@ -126,19 +131,21 @@ window.addEventListener("load", function () {
         this.width,
         this.height
       );
-      context.beginPath();
-      context.arc(
-        this.collisionX,
-        this.collisionY,
-        this.collisionRadius,
-        0,
-        Math.PI * 2 //full circle
-      );
-      context.save();
-      context.globalAlpha = 0.5;
-      context.fill();
-      context.restore();
-      context.stroke();
+      if (this.game.debug) {
+        context.beginPath();
+        context.arc(
+          this.collisionX,
+          this.collisionY,
+          this.collisionRadius,
+          0,
+          Math.PI * 2 //full circle
+        );
+        context.save();
+        context.globalAlpha = 0.5;
+        context.fill();
+        context.restore();
+        context.stroke();
+      }
     }
   }
   class Game {
@@ -150,12 +157,12 @@ window.addEventListener("load", function () {
       this.numberOfObstacles = 10;
       this.obstacles = [];
       this.topMargin = 260;
-
       this.mouse = {
         x: this.width * 0.5,
         y: this.height * 0.5,
         pressed: false,
       };
+      this.debug = true;
       this.canvas.addEventListener("mousedown", (e) => {
         //inherit ref to this keyword from parent scope
         this.mouse.x = e.offsetX;
@@ -172,6 +179,12 @@ window.addEventListener("load", function () {
         if (this.mouse.pressed) {
           this.mouse.x = e.offsetX;
           this.mouse.y = e.offsetY;
+        }
+      });
+      window.addEventListener("keydown", (e) => {
+        if (e.key === "d") {
+          this.debug = !this.debug;
+          console.log(this.debug);
         }
       });
     }
