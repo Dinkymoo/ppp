@@ -1,0 +1,21 @@
+{
+    "app_name": "game",
+    "chromium-args": "--data-path='./saves/' --in-process-gpu --disable-transparency",
+    "main": "index.html",
+    "name": "curvatron",
+    "version": "0.1.0",
+    "webkit": {},
+    "window": {
+        "frame": true,
+        "fullscreen": false,
+        "height": 600,
+        "id": "game",
+        "resizable": true,
+        "show": true,
+        "show_in_taskbar": true,
+        "title": "Curvatron",
+        "toolbar": true,
+        "visible": true,
+        "width": 800
+    }
+}
