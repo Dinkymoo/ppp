@@ -51,7 +51,15 @@ window.addEventListener("load", function () {
       this.collisionY += this.speedY * this.speedModifier;
       //collisions with obstacles
       this.game.obstacles.forEach((obstacle) => {
-        console.log(this.game.checkCollision(this, obstacle)); //must have collisionx/y and radius defined
+        let [collision, distance, sumOfRadii, dx, dy] =
+          this.game.checkCollision(this, obstacle);
+
+        if (collision) {
+          const const_x = dx / distance;
+          const const_y = dy / distance;
+          this.collisionX = obstacle.collisionX + (sumOfRadii + 1) * const_x;
+          this.collisionY = obstacle.collisionY + (sumOfRadii + 1) * const_y;
+        }
       });
     }
   }
@@ -142,7 +150,7 @@ window.addEventListener("load", function () {
       const dy = a.collisionY - b.collisionY;
       const distance = Math.hypot(dy, dx);
       const sumOfRadii = a.collisionRadius + b.collisionRadius;
-      return distance < sumOfRadii;
+      return [distance < sumOfRadii, distance, sumOfRadii, dx, dy];
     }
     init() {
       let attempts = 0;
