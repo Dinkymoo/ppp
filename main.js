@@ -11,13 +11,35 @@ window.addEventListener("load", function () {
     constructor(game) {
       this.game = game;
       this.collisionX = this.game.width * 0.5;
-      this.collisionY = this.game.height * 0.5;
-      this.collisionRadius = 30;
+      this.collisionY = this.game.height * 0.5; //center of player collision
+      this.collisionRadius = 50;
       this.speedX = 0;
       this.speedY = 0;
-      this.speedModifier = 1;
+      this.dx = 0;
+      this.dy = 0;
+      this.speedModifier = 5;
+      this.spriteWidth = 255;
+      this.spriteHeight = 255;
+      this.width = this.spriteWidth;
+      this.height = this.spriteHeight;
+      this.spriteX;
+      this.spriteY; //top left corner of sprite sheet
+      this.frameX = 0;
+      this.frameY = 5;
+      this.image = document.getElementById("bull");
     }
     draw(context) {
+      context.drawImage(
+        this.image,
+        0,
+        0,
+        this.spriteWidth,
+        this.spriteHeight,
+        this.spriteX,
+        this.spriteY,
+        this.width,
+        this.height
+      );
       context.beginPath();
       context.arc(
         this.collisionX,
@@ -37,8 +59,11 @@ window.addEventListener("load", function () {
       context.stroke();
     }
     update() {
+      //sprite animation
       this.dx = this.game.mouse.x - this.collisionX;
       this.dy = this.game.mouse.y - this.collisionY;
+      // const angle = Math.atan2(dy, dx); //angle between player and mouse cursor in radians
+
       const distance = Math.hypot(this.dy, this.dx);
       if (distance > this.speedModifier) {
         this.speedX = this.dx / distance || 0;
@@ -49,6 +74,9 @@ window.addEventListener("load", function () {
       }
       this.collisionX += this.speedX * this.speedModifier;
       this.collisionY += this.speedY * this.speedModifier;
+      //update every time
+      this.spriteX = this.collisionX - this.width * 0.5;
+      this.spriteY = this.collisionY - this.height * 0.5 - 100; //use shadow as collision area momve player up
       //collisions with obstacles
       this.game.obstacles.forEach((obstacle) => {
         let [collision, distance, sumOfRadii, dx, dy] =
