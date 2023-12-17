@@ -12,7 +12,7 @@ window.addEventListener("load", function () {
       this.game = game;
       this.collisionX = this.game.width * 0.5;
       this.collisionY = this.game.height * 0.5; //center of player collision
-      this.collisionRadius = 50;
+      this.collisionRadius = 30; //smaller than obstacle to squeeze past
       this.speedX = 0;
       this.speedY = 0;
       this.dx = 0;
@@ -25,7 +25,7 @@ window.addEventListener("load", function () {
       this.spriteX;
       this.spriteY; //top left corner of sprite sheet
       this.frameX = 0;
-      this.frameY = 5;
+      this.a = 5;
       this.image = document.getElementById("bull");
     }
     draw(context) {
@@ -90,6 +90,17 @@ window.addEventListener("load", function () {
       this.spriteX = this.collisionX - this.width * 0.5;
       this.spriteY = this.collisionY - this.height * 0.5 - 100; //use shadow as collision area momve player up
       //collisions with obstacles
+      //horizontal boundaries
+      if (this.collisionX < this.collisionRadius)
+        this.collisionX = this.collisionRadius; //don't go further left
+      else if (this.collisionX > this.game.width - this.collisionRadius)
+        this.collisionX = this.game.width - this.collisionRadius;
+      //don't go further right
+      //vertical boundaries
+      if (this.collisionY < this.game.topMargin + this.collisionRadius)
+        this.collisionY = this.game.topMargin + this.collisionRadius; //top
+      else if (this.collisionY < this.game.topMargin + this.collisionRadius)
+        this.collisionY = this.game.width - this.collisionRadius; //bottom
       this.game.obstacles.forEach((obstacle) => {
         let [collision, distance, sumOfRadii, dx, dy] =
           this.game.checkCollision(this, obstacle);
@@ -108,7 +119,7 @@ window.addEventListener("load", function () {
       this.game = game;
       this.collisionX = Math.random() * this.game.width;
       this.collisionY = Math.random() * this.game.height;
-      this.collisionRadius = 60;
+      this.collisionRadius = 40;
       this.image = document.getElementById("obstacles");
       this.spriteWidth = 250;
       this.spriteHeight = 250;
@@ -154,6 +165,9 @@ window.addEventListener("load", function () {
       this.width = canvas.width;
       this.height = canvas.height;
       this.player = new Player(this);
+      this.fps = 20;
+      this.timer = 0;
+      this.interval = 1000 / this.fps;
       this.numberOfObstacles = 10;
       this.obstacles = [];
       this.topMargin = 260;
@@ -182,16 +196,35 @@ window.addEventListener("load", function () {
         }
       });
       window.addEventListener("keydown", (e) => {
-        if (e.key === "d") {
+        if (e.key === "b") {
           this.debug = !this.debug;
           console.log(this.debug);
         }
+        //keyboard controls
+        //this needs work it does not abide to the vertical boudaries
+        if (e.key === "w") {
+          this.mouse.y -= 10;
+        }
+        if (e.key === "s") {
+          this.mouse.y += 10;
+        }
+        if (e.key === "a") {
+          this.mouse.x -= 10;
+        }
+        if (e.key === "d") {
+          this.mouse.x += 10;
+        }
       });
     }
-    render(context) {
-      this.player.draw(context);
-      this.player.update();
-      this.obstacles.forEach((obstacle) => obstacle.draw(context));
+    render(context, deltaTime) {
+      if (this.timer > this.interval) {
+        ctx.clearRect(0, 0, this.width, this.height);
+        this.obstacles.forEach((obstacle) => obstacle.draw(context));
+        this.player.draw(context);
+        this.player.update();
+        this.timer = 0;
+      }
+      this.timer += deltaTime;
     }
     checkCollision(a, b) {
       const dx = a.collisionX - b.collisionX;
@@ -218,7 +251,7 @@ window.addEventListener("load", function () {
             overlap = true;
           }
         });
-        const margin = testObstacle.collisionRadius * 2; //squeeze space
+        const margin = testObstacle.collisionRadius * 3; //squeeze space
         if (
           !overlap &&
           testObstacle.spriteX > 0 &&
@@ -236,11 +269,12 @@ window.addEventListener("load", function () {
   const game = new Game(cvas);
   console.log(game);
   game.init();
-
-  function animate() {
-    ctx.clearRect(0, 0, cvas.width, cvas.height);
-    game.render(ctx);
+  let lastTime = 0;
+  function animate(timeStamp) {
+    const deltaTime = timeStamp - lastTime; //refresh rate at 60Hz = 8
+    game.render(ctx, deltaTime);
     requestAnimationFrame(animate);
+    lastTime = timeStamp;
   }
-  animate();
+  animate(0);
 });
