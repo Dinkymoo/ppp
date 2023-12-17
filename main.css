@@ -18,6 +18,7 @@
   pointer-events: none;
 }
 #obstacles,
-#bull {
+#bull,
+#egg {
   display: none;
 }
