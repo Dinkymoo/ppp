@@ -44,7 +44,7 @@ window.addEventListener("load", function () {
         this.width,
         this.height
       );
-      if (this.game.debug) {
+      if (this.game.debug === true) {
         context.beginPath();
         context.arc(
           this.collisionX,
@@ -146,7 +146,7 @@ window.addEventListener("load", function () {
         this.width,
         this.height
       );
-      if (this.game.debug) {
+      if (this.game.debug === true) {
         context.beginPath();
         context.arc(
           this.collisionX,
@@ -190,7 +190,7 @@ window.addEventListener("load", function () {
     }
     draw(context) {
       context.drawImage(this.image, this.spriteX, this.spriteY);
-      if (this.game.debug) {
+      if (this.game.debug === true) {
         context.beginPath();
         context.arc(
           this.collisionX,
@@ -483,7 +483,7 @@ window.addEventListener("load", function () {
         y: this.height * 0.5,
         pressed: false,
       };
-      this.debug = true;
+      this.debug = false;
       this.gameObjects = [];
 
       //obstacles
