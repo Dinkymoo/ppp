@@ -191,32 +191,34 @@ window.addEventListener("load", function () {
     draw(context) {
       context.drawImage(this.image, this.spriteX, this.spriteY);
       if (this.game.debug) {
-        context.beginPath();
-        context.arc(
-          this.collisionX,
-          this.collisionY,
-          this.collisionRadius,
-          0,
-          Math.PI * 2 //full circle
-        );
-        context.save();
-        context.globalAlpha = 0.5;
-        context.fill();
-        context.restore();
-        context.stroke();
-        const displayTimer = (this.hatchTimer * 0.001).toFixed(0); //rounded string to zero decimals
-        context.fillText(
-          displayTimer,
-          this.collisionX,
-          this.collisionY - this.collisionRadius * 2.5
-        );
+        if (this.game.debug) {
+          context.beginPath();
+          context.arc(
+            this.collisionX,
+            this.collisionY,
+            this.collisionRadius,
+            0,
+            Math.PI * 2 //full circle
+          );
+          context.save();
+          context.globalAlpha = 0.5;
+          context.fill();
+          context.restore();
+          context.stroke();
+          const displayTimer = (this.hatchTimer * 0.001).toFixed(0); //rounded string to zero decimals
+          context.fillText(
+            displayTimer,
+            this.collisionX,
+            this.collisionY - this.collisionRadius * 2.5
+          );
+        }
       }
     }
     update(deltaTime) {
       this.spriteX = this.collisionX - this.width * 0.5;
       this.spriteY = this.collisionY - this.height * 0.5 - 30;
-      let collisionObject = [this.game.player, ...this.game.obstacles];
       //collisions
+      let collisionObject = [this.game.player, ...this.game.obstacles];
       collisionObject.forEach((object) => {
         let [collision, distance, sumOfRadii, dx, dy] =
           this.game.checkCollision(this, object);
@@ -231,12 +233,14 @@ window.addEventListener("load", function () {
       });
       //hatching
       if (this.hatchTimer > this.hatchInterval) {
+        this.game.hatchlings.push(
+          new Larva(this.game, this.collisionX, this.collisionY)
+        );
         this.markedForDeletion = true;
         this.game.removeGameObjects();
         this.hatchTimer = 0;
       } else {
-        this.hatchTimer += deltaTime; //adds 8
-        console.log(this.hatchTimer);
+        this.hatchTimer += deltaTime;
       }
     }
   }
@@ -322,14 +326,69 @@ window.addEventListener("load", function () {
       this.spriteX;
       this.spriteY;
       this.speedY = 1 + Math.random();
+      this.frameX = 0;
+      this.frameY = Math.floor(Math.random() * 2);
     }
     draw(context) {
-      context.drawImage(this.image, this.spriteX, this.spriteY);
+      context.drawImage(
+        this.image,
+        this.frameX,
+        this.frameY,
+        this.spriteWidth,
+        this.spriteHeight,
+        this.spriteX,
+        this.spriteY,
+        this.width,
+        this.height
+      );
+      if (this.game.debug) {
+        context.beginPath();
+        context.arc(
+          this.collisionX,
+          this.collisionY,
+          this.collisionRadius,
+          0,
+          Math.PI * 2 //full circle
+        );
+        context.save();
+        context.globalAlpha = 0.5;
+        context.fill();
+        context.restore();
+        context.stroke();
+      }
     }
     update() {
       this.collisionY -= this.speedY;
       this.spriteX = this.collisionX - this.width * 0.5;
       this.spriteY = this.collisionY - this.height * 0.5;
+      // hatchlings are safe
+      if (this.collisionY < this.game.topMargin) {
+        this.markedForDeletion = true;
+        this.game.removeGameObjects();
+        this.game.score++;
+      }
+      //collisions with objects
+      let collisionObject = [this.game.player, ...this.game.obstacles];
+      collisionObject.forEach((object) => {
+        let [collision, distance, sumOfRadii, dx, dy] =
+          this.game.checkCollision(this, object);
+        if (collision) {
+          //between -1 and +1
+          const unit_x = dx / distance;
+          const unit_y = dy / distance;
+          this.collisionX = object.collisionX + (sumOfRadii + 1) * unit_x;
+          this.collisionY = object.collisionY + (sumOfRadii + 1) * unit_y;
+          //moving the egg based on the position of the obstacle
+        }
+      });
+      //collisions with enemies
+      this.game.enemies.forEach((enemy) => {
+        if (this.game.checkCollision(this, enemy)[0]) {
+          this.markedForDeletion = true;
+          this.game.removeGameObjects();
+          this.game.lostHatchlings++;
+        }
+      });
     }
   }
   class Game {
@@ -340,11 +399,14 @@ window.addEventListener("load", function () {
       this.player = new Player(this);
       this.fps = 70;
       this.topMargin = 260;
+      this.score = 0;
+      this.lostHatchlings = 0;
       this.mouse = {
         x: this.width * 0.5,
         y: this.height * 0.5,
         pressed: false,
       };
+      this.debug = true;
       this.gameObjects = [];
 
       //obstacles
@@ -357,11 +419,10 @@ window.addEventListener("load", function () {
       this.eggInterval = 1000;
       this.maxEggs = 10;
       this.eggs = [];
-
       //enemies
       this.enemies = [];
-
-      this.debug = true;
+      //larva
+      this.hatchlings = [];
 
       this.canvas.addEventListener("mousedown", (e) => {
         //inherit ref to this keyword from parent scope
@@ -396,6 +457,7 @@ window.addEventListener("load", function () {
           ...this.eggs,
           ...this.obstacles,
           ...this.enemies,
+          ...this.hatchlings,
         ];
         //sprites higher up will be behind sprites lower down
         this.gameObjects.sort((a, b) => {
@@ -410,6 +472,14 @@ window.addEventListener("load", function () {
       }
       this.timer += deltaTime;
 
+      //status text
+      context.save();
+      context.textAlign = "left";
+      context.fillText("Score " + this.score, 25, 50);
+      if (this.debug) {
+        context.fillText("Lost " + this.lostHatchlings, 25, 100);
+      }
+      context.restore();
       //add eggs periodically
       if (this.eggTimer > this.eggInterval && this.eggs.length < this.maxEggs) {
         this.addEgg();
@@ -431,9 +501,8 @@ window.addEventListener("load", function () {
       this.enemies.push(new Enemy(this));
     }
     removeGameObjects() {
-      console.log("b", this.eggs);
       this.eggs = this.eggs.filter((e) => !e.markedForDeletion);
-      console.log("a", this.eggs);
+      this.hatchlings = this.hatchlings.filter((e) => !e.markedForDeletion);
     }
     init() {
       //add enemies
