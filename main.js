@@ -191,27 +191,25 @@ window.addEventListener("load", function () {
     draw(context) {
       context.drawImage(this.image, this.spriteX, this.spriteY);
       if (this.game.debug) {
-        if (this.game.debug) {
-          context.beginPath();
-          context.arc(
-            this.collisionX,
-            this.collisionY,
-            this.collisionRadius,
-            0,
-            Math.PI * 2 //full circle
-          );
-          context.save();
-          context.globalAlpha = 0.5;
-          context.fill();
-          context.restore();
-          context.stroke();
-          const displayTimer = (this.hatchTimer * 0.001).toFixed(0); //rounded string to zero decimals
-          context.fillText(
-            displayTimer,
-            this.collisionX,
-            this.collisionY - this.collisionRadius * 2.5
-          );
-        }
+        context.beginPath();
+        context.arc(
+          this.collisionX,
+          this.collisionY,
+          this.collisionRadius,
+          0,
+          Math.PI * 2 //full circle
+        );
+        context.save();
+        context.globalAlpha = 0.5;
+        context.fill();
+        context.restore();
+        context.stroke();
+        const displayTimer = (this.hatchTimer * 0.001).toFixed(0); //rounded string to zero decimals
+        context.fillText(
+          displayTimer,
+          this.collisionX,
+          this.collisionY - this.collisionRadius * 2.5
+        );
       }
     }
     update(deltaTime) {
@@ -232,7 +230,10 @@ window.addEventListener("load", function () {
         }
       });
       //hatching
-      if (this.hatchTimer > this.hatchInterval) {
+      if (
+        this.hatchTimer > this.hatchInterval ||
+        this.collisionY < this.game.topMargin //egg pushed to top margin
+      ) {
         this.game.hatchlings.push(
           new Larva(this.game, this.collisionX, this.collisionY)
         );
@@ -333,7 +334,7 @@ window.addEventListener("load", function () {
       context.drawImage(
         this.image,
         this.frameX,
-        this.frameY,
+        this.frameY * this.spriteHeight,
         this.spriteWidth,
         this.spriteHeight,
         this.spriteX,
@@ -367,9 +368,8 @@ window.addEventListener("load", function () {
         this.game.removeGameObjects();
         this.game.score++;
         for (let i = 0; i < 3; i++) {
-          let color = "yellow";
           this.game.particles.push(
-            new Firefly(this.game, this.collisionX, this.collisionY, color)
+            new Firefly(this.game, this.collisionX, this.collisionY, "yellow")
           );
         }
       }
@@ -393,6 +393,12 @@ window.addEventListener("load", function () {
           this.markedForDeletion = true;
           this.game.removeGameObjects();
           this.game.lostHatchlings++;
+          for (let i = 0; i < 5; i++) {
+            //use 5 fpr performance
+            this.game.particles.push(
+              new Spark(this.game, this.collisionX, this.collisionY, "blue")
+            );
+          }
         }
       });
     }
@@ -439,7 +445,16 @@ window.addEventListener("load", function () {
     }
   }
   class Spark extends Particle {
-    update() {}
+    update() {
+      this.angle += this.va * 0.5;
+      this.collisionX -= Math.cos(this.angle) * this.speedX;
+      this.collisionY -= Math.sin(this.angle) * this.speedY;
+      if (this.radius > 0.1) this.radius -= 0.05;
+      if (this.radius < 0.2) {
+        this.markedForDeletion = true;
+        this.game.removeGameObjects();
+      }
+    }
   }
   class Game {
     constructor(canvas) {
