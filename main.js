@@ -25,7 +25,7 @@ window.addEventListener("load", function () {
       this.spriteX;
       this.spriteY; //top left corner of sprite sheet
       this.frameX = 0;
-      this.a = 5;
+      this.frameY = 5;
       this.image = document.getElementById("bull");
     }
     draw(context) {
@@ -88,7 +88,7 @@ window.addEventListener("load", function () {
       this.collisionY += this.speedY * this.speedModifier;
       //update every time
       this.spriteX = this.collisionX - this.width * 0.5;
-      this.spriteY = this.collisionY - this.height * 0.5 - 100; //use shadow as collision area momve player up
+      this.spriteY = this.collisionY - this.height * 0.5 - 100; //use shadow as collision area move player up
       //collisions with obstacles
       //horizontal boundaries
       if (this.collisionX < this.collisionRadius)
@@ -218,6 +218,74 @@ window.addEventListener("load", function () {
       });
     }
   }
+  class Enemy {
+    constructor(game) {
+      this.game = game;
+      this.collisionRadius = 30;
+      this.speedX = Math.random() * 3 + 0.5;
+      this.image = document.getElementById("toad");
+      this.spriteWidth = 140;
+      this.spriteHeight = 260;
+      this.width = this.spriteWidth;
+      this.height = this.spriteHeight;
+      this.collisionX = this.game.width + Math.random() * this.game.width * 0.5; //give each one a random delay
+      this.collisionY =
+        this.game.topMargin +
+        Math.random() * (this.game.height - this.game.topMargin);
+      this.spriteX;
+      this.spriteY;
+    }
+    draw(context) {
+      context.drawImage(this.image, this.spriteX, this.spriteY);
+      if (this.game.debug) {
+        context.beginPath();
+        context.arc(
+          this.collisionX,
+          this.collisionY,
+          this.collisionRadius,
+          0,
+          Math.PI * 2 //full circle
+        );
+        context.save();
+        context.globalAlpha = 0.5;
+        context.fill();
+        context.restore();
+        context.stroke();
+      }
+    }
+    update() {
+      //enemies walk from right to left
+      this.spriteX = this.collisionX - this.width * 0.5;
+      this.spriteY = this.collisionY - this.height + 40;
+      this.collisionX -= this.speedX; //move to the left
+      if (this.spriteX + this.width < 0) {
+        // right edge is hidden behind canvas
+        this.collisionX =
+          this.game.width + Math.random() * this.game.width * 0.5; //give each one a random delay
+        this.collisionY =
+          this.game.topMargin +
+          Math.random() * (this.game.height - this.game.topMargin);
+      }
+      let collisionObject = [
+        this.game.player,
+        ...this.game.obstacles,
+        ...this.game.eggs,
+      ]; //enemy will push eggs
+
+      collisionObject.forEach((object) => {
+        let [collision, distance, sumOfRadii, dx, dy] =
+          this.game.checkCollision(this, object);
+        if (collision) {
+          //between -1 and +1
+          const unit_x = dx / distance;
+          const unit_y = dy / distance;
+          this.collisionX = object.collisionX + (sumOfRadii + 1) * unit_x;
+          this.collisionY = object.collisionY + (sumOfRadii + 1) * unit_y;
+          // enemy is based on the position of the obstacle
+        }
+      });
+    }
+  }
   class Game {
     constructor(canvas) {
       this.canvas = canvas;
@@ -241,8 +309,11 @@ window.addEventListener("load", function () {
       //egg
       this.eggTimer = 0;
       this.eggInterval = 1000;
-      this.maxEggs = 20;
+      this.maxEggs = 0;
       this.eggs = [];
+
+      //enemies
+      this.enemies = [];
 
       this.debug = true;
 
@@ -265,33 +336,24 @@ window.addEventListener("load", function () {
         }
       });
       window.addEventListener("keydown", (e) => {
-        if (e.key === "b") {
+        if (e.key === "d") {
           this.debug = !this.debug;
           console.log(this.debug);
         }
-        //keyboard controls
-        //this needs work it does not abide to the vertical boudaries
-        // if (e.key === "w") {
-        //   this.mouse.y -= 10;
-        // }
-        // if (e.key === "s") {
-        //   this.mouse.y += 10;
-        // }
-        // if (e.key === "a") {
-        //   this.mouse.x -= 10;
-        // }
-        // if (e.key === "d") {
-        //   this.mouse.x += 10;
-        // }
       });
     }
     render(context, deltaTime) {
       if (this.timer > this.interval) {
         ctx.clearRect(0, 0, this.width, this.height);
-        this.gameObjects = [...this.eggs, ...this.obstacles, this.player];
+        this.gameObjects = [
+          this.player,
+          ...this.eggs,
+          ...this.obstacles,
+          ...this.enemies,
+        ];
         //sprites higher up will be behind sprites lower down
         this.gameObjects.sort((a, b) => {
-          return a.collisionY + a.spriteHeight - b.collisionY + b.spriteHeight;
+          return a.collisionY - b.collisionY;
         });
         this.gameObjects.forEach((object) => {
           object.draw(context);
@@ -319,7 +381,15 @@ window.addEventListener("load", function () {
     addEgg() {
       this.eggs.push(new Eggs(this));
     }
+    addEnemy() {
+      this.enemies.push(new Enemy(this));
+    }
     init() {
+      //add enemies
+      for (let i = 0; i < 5; i++) {
+        this.addEnemy();
+      }
+      //add obstacles
       let attempts = 0;
       while (this.obstacles.length < this.numberOfObstacles && attempts < 500) {
         let testObstacle = new Obstacle(this);
