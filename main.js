@@ -297,7 +297,7 @@ window.addEventListener("load", function () {
       this.spriteX = this.collisionX - this.width * 0.5;
       this.spriteY = this.collisionY - this.height + 40;
       this.collisionX -= this.speedX; //move to the left
-      if (this.spriteX + this.width < 0) {
+      if (this.spriteX + this.width < 0 && !this.game.gameOver) {
         // right edge is hidden behind canvas
         this.collisionX =
           this.game.width + Math.random() * this.game.width * 0.5; //give each one a random delay
@@ -354,7 +354,7 @@ window.addEventListener("load", function () {
         this.width,
         this.height
       );
-      if (this.game.debug) {
+      if (this.game?.debug) {
         context.beginPath();
         context.arc(
           this.collisionX,
@@ -378,7 +378,7 @@ window.addEventListener("load", function () {
       if (this.collisionY < this.game.topMargin) {
         this.markedForDeletion = true;
         this.game.removeGameObjects();
-        this.game.score++;
+        if (!this.game.gameOver) this.game.score++;
         for (let i = 0; i < 3; i++) {
           this.game.particles.push(
             new Firefly(this.game, this.collisionX, this.collisionY, "yellow")
@@ -405,6 +405,7 @@ window.addEventListener("load", function () {
           this.markedForDeletion = true;
           this.game.removeGameObjects();
           this.game.lostHatchlings++;
+
           for (let i = 0; i < 5; i++) {
             //use 5 fpr performance
             this.game.particles.push(
@@ -499,7 +500,7 @@ window.addEventListener("load", function () {
       //egg
       this.eggTimer = 0;
       this.eggInterval = 1000;
-      this.maxEggs = 10;
+      this.maxEggs = 29;
       this.eggs = [];
       //enemies
       this.enemies = [];
@@ -532,6 +533,9 @@ window.addEventListener("load", function () {
           this.debug = !this.debug;
           console.log(this.debug);
         }
+        if (e.key === "r") {
+          window.location.reload();
+        }
       });
     }
     render(context, deltaTime) {
@@ -559,7 +563,11 @@ window.addEventListener("load", function () {
       this.timer += deltaTime;
 
       //add eggs periodically
-      if (this.eggTimer > this.eggInterval && this.eggs.length < this.maxEggs) {
+      if (
+        this.eggTimer > this.eggInterval &&
+        this.eggs.length < this.maxEggs &&
+        !this.gameOver
+      ) {
         this.addEgg();
         this.eggTimer = 0;
       }
@@ -574,7 +582,8 @@ window.addEventListener("load", function () {
       }
       context.restore();
       //win/lose message
-      if (this.lostHatchlings >= this.winningScore) {
+
+      if (this.score >= this.winningScore) {
         this.gameOver = true;
         context.save();
         context.fillStyle = "rgba(0,0,0,0.5)";
@@ -583,7 +592,7 @@ window.addEventListener("load", function () {
         context.textAlign = "center";
         let message1;
         let message2;
-        if (this.hatchlings <= 5) {
+        if (this.lostHatchlings <= 5) {
           //win
           message1 = "Bang on!!!";
           message2 = "Who knew you had these skills!";
@@ -595,18 +604,17 @@ window.addEventListener("load", function () {
             this.lostHatchlings +
             " hatchlings, don't be a pushover!";
         }
-        console.font = "130px Helvetica";
+        console.font = "130px Banger";
         context.fillText(message1, this.width * 0.5, this.height * 0.5 - 20);
-        console.font = "40px Helvetica";
+        console.font = "40px Banger";
         context.fillText(message2, this.width * 0.5, this.height * 0.5 + 30);
         context.fillText(
           "Final Score " + this.score + ". Press 'R' to keep saving lifes!",
           this.width * 0.5,
           this.height * 0 + 80
         );
+        context.restore();
       }
-
-      context.restore();
     }
     checkCollision(a, b) {
       const dx = a.collisionX - b.collisionX;
@@ -672,7 +680,7 @@ window.addEventListener("load", function () {
   function animate(timeStamp) {
     const deltaTime = timeStamp - lastTime; //refresh rate at 60Hz = 8
     game.render(ctx, deltaTime);
-    if (!game.gameOver) requestAnimationFrame(animate);
+    requestAnimationFrame(animate);
     lastTime = timeStamp;
   }
   animate(0);
