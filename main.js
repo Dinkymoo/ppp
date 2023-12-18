@@ -261,9 +261,21 @@ window.addEventListener("load", function () {
         Math.random() * (this.game.height - this.game.topMargin);
       this.spriteX;
       this.spriteY;
+      this.frameX = 0;
+      this.frameY = 0;
     }
     draw(context) {
-      context.drawImage(this.image, this.spriteX, this.spriteY);
+      context.drawImage(
+        this.image,
+        this.frameX,
+        this.frameY,
+        this.spriteWidth,
+        this.spriteHeight,
+        this.spriteX,
+        this.spriteY,
+        this.width,
+        this.height
+      );
       if (this.game.debug) {
         context.beginPath();
         context.arc(
@@ -508,6 +520,10 @@ window.addEventListener("load", function () {
           this.mouse.x = e.offsetX;
           this.mouse.y = e.offsetY;
         }
+      });
+      this.canvas.addEventListener("ontouchmove", (e) => {
+        this.mouse.x = e.offsetX;
+        this.mouse.y = e.offsetY;
       });
       window.addEventListener("keydown", (e) => {
         if (e.key === "d") {
