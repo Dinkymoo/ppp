@@ -521,10 +521,7 @@ window.addEventListener("load", function () {
           this.mouse.y = e.offsetY;
         }
       });
-      this.canvas.addEventListener("ontouchmove", (e) => {
-        this.mouse.x = e.offsetX;
-        this.mouse.y = e.offsetY;
-      });
+
       window.addEventListener("keydown", (e) => {
         if (e.key === "d") {
           this.debug = !this.debug;
