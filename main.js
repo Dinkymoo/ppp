@@ -415,6 +415,7 @@ window.addEventListener("load", function () {
       });
     }
   }
+
   class Particle {
     constructor(game, x, y, color) {
       this.game = game;
@@ -468,8 +469,11 @@ window.addEventListener("load", function () {
       }
     }
   }
+
   class Game {
     constructor(canvas) {
+      this.debug = false;
+
       this.canvas = canvas;
       this.width = canvas.width;
       this.height = canvas.height;
@@ -477,13 +481,14 @@ window.addEventListener("load", function () {
       this.fps = 70;
       this.topMargin = 260;
       this.score = 0;
+      this.winningScore = 5;
       this.lostHatchlings = 0;
       this.mouse = {
         x: this.width * 0.5,
         y: this.height * 0.5,
         pressed: false,
       };
-      this.debug = false;
+      this.gameOver = false;
       this.gameObjects = [];
 
       //obstacles
@@ -553,6 +558,13 @@ window.addEventListener("load", function () {
       }
       this.timer += deltaTime;
 
+      //add eggs periodically
+      if (this.eggTimer > this.eggInterval && this.eggs.length < this.maxEggs) {
+        this.addEgg();
+        this.eggTimer = 0;
+      }
+      this.eggTimer += deltaTime;
+
       //status text
       context.save();
       context.textAlign = "left";
@@ -561,12 +573,40 @@ window.addEventListener("load", function () {
         context.fillText("Lost " + this.lostHatchlings, 25, 100);
       }
       context.restore();
-      //add eggs periodically
-      if (this.eggTimer > this.eggInterval && this.eggs.length < this.maxEggs) {
-        this.addEgg();
-        this.eggTimer = 0;
+      //win/lose message
+      if (this.lostHatchlings >= this.winningScore) {
+        this.gameOver = true;
+        context.save();
+        context.fillStyle = "rgba(0,0,0,0.5)";
+        context.fillRect(0, 0, this.width, this.height);
+        context.fillStyle = "white";
+        context.textAlign = "center";
+        let message1;
+        let message2;
+        if (this.hatchlings <= 5) {
+          //win
+          message1 = "Bang on!!!";
+          message2 = "Who knew you had these skills!";
+        } else {
+          //lose
+          message1 = "Oh dear!";
+          message2 =
+            "You lost " +
+            this.lostHatchlings +
+            " hatchlings, don't be a pushover!";
+        }
+        console.font = "130px Helvetica";
+        context.fillText(message1, this.width * 0.5, this.height * 0.5 - 20);
+        console.font = "40px Helvetica";
+        context.fillText(message2, this.width * 0.5, this.height * 0.5 + 30);
+        context.fillText(
+          "Final Score " + this.score + ". Press 'R' to keep saving lifes!",
+          this.width * 0.5,
+          this.height * 0 + 80
+        );
       }
-      this.eggTimer += deltaTime;
+
+      context.restore();
     }
     checkCollision(a, b) {
       const dx = a.collisionX - b.collisionX;
@@ -624,6 +664,7 @@ window.addEventListener("load", function () {
       }
     }
   }
+
   const game = new Game(cvas);
   console.log(game);
   game.init();
@@ -631,7 +672,7 @@ window.addEventListener("load", function () {
   function animate(timeStamp) {
     const deltaTime = timeStamp - lastTime; //refresh rate at 60Hz = 8
     game.render(ctx, deltaTime);
-    requestAnimationFrame(animate);
+    if (!game.gameOver) requestAnimationFrame(animate);
     lastTime = timeStamp;
   }
   animate(0);
