@@ -410,7 +410,7 @@ window.addEventListener("load", function () {
         if (this.game.checkCollision(this, enemy)[0]) {
           this.markedForDeletion = true;
           this.game.removeGameObjects();
-          this.game.lostHatchlings++;
+          if (!this.game.gameOver) this.game.lostHatchlings++;
 
           for (let i = 0; i < 5; i++) {
             //use 5 fpr performance
@@ -488,7 +488,7 @@ window.addEventListener("load", function () {
       this.fps = 70;
       this.topMargin = 260;
       this.score = 0;
-      this.winningScore = 5;
+      this.winningScore = 30;
       this.lostHatchlings = 0;
       this.mouse = {
         x: this.width * 0.5,
@@ -603,21 +603,21 @@ window.addEventListener("load", function () {
         let message2;
         if (this.lostHatchlings <= 5) {
           //win
-          message1 = "Bang On !!!";
-          message2 = "Who knew you had these skills!";
+          message1 = "Bang On!!!";
+          message2 = "Who knew you had these skills?";
         } else {
           //lose
-          message1 = "Oh dear!";
+          message1 = "Dang!";
           message2 =
             "You lost " +
             this.lostHatchlings +
             " hatchlings, don't be a pushover!";
         }
-        context.save();
-        console.font = "130px Banger";
+
+        context.font = "130px Bangers";
         context.fillText(message1, this.width * 0.5, this.height * 0.5 - 20);
-        context.restore();
-        console.font = "40px Banger";
+
+        context.font = "40px Bangers";
         context.fillText(message2, this.width * 0.5, this.height * 0.5 + 30);
 
         context.fillText(
