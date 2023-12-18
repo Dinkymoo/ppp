@@ -428,7 +428,8 @@ window.addEventListener("load", function () {
   class Firefly extends Particle {
     update() {
       this.angle += this.va;
-      this.collisionX += this.speedX;
+      this.collisionX += Math.cos(this.angle) * this.speedX; //manipulate swirl
+      //how far left and right the motion goes
       this.collisionY -= this.speedY;
       //floating up and swaying left and right
       if (this.collisionY < 0 - this.radius) {
