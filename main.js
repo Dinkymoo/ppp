@@ -8,7 +8,7 @@ window.addEventListener("load", function () {
   ctx.fillStyle = "white";
   ctx.lineWidth = 3;
   ctx.strokeStyle = "black";
-  ctx.font = "40px Helvetica";
+  ctx.font = "40px Bangers";
   ctx.textAlign = "center";
 
   class Player {
@@ -116,6 +116,12 @@ window.addEventListener("load", function () {
           this.collisionY = obstacle.collisionY + (sumOfRadii + 1) * unit_y;
         }
       });
+    }
+    restart() {
+      this.collisionX = this.game.width * 0.5;
+      this.collisionY = this.game.height * 0.5;
+      this.spriteX = this.collisionX - this.width * 0.5;
+      this.spriteY = this.collisionY - this.height * 0.5 - 100;
     }
   }
   class Obstacle {
@@ -534,7 +540,7 @@ window.addEventListener("load", function () {
           console.log(this.debug);
         }
         if (e.key === "r") {
-          window.location.reload();
+          this.restart();
         }
       });
     }
@@ -590,11 +596,14 @@ window.addEventListener("load", function () {
         context.fillRect(0, 0, this.width, this.height);
         context.fillStyle = "white";
         context.textAlign = "center";
+        context.shadowOffsetX = 4;
+        context.shadowOffsetY = 4;
+        context.shadowColor = "black";
         let message1;
         let message2;
         if (this.lostHatchlings <= 5) {
           //win
-          message1 = "Bang on!!!";
+          message1 = "Bang On !!!";
           message2 = "Who knew you had these skills!";
         } else {
           //lose
@@ -604,14 +613,19 @@ window.addEventListener("load", function () {
             this.lostHatchlings +
             " hatchlings, don't be a pushover!";
         }
+        context.save();
         console.font = "130px Banger";
         context.fillText(message1, this.width * 0.5, this.height * 0.5 - 20);
+        context.restore();
         console.font = "40px Banger";
         context.fillText(message2, this.width * 0.5, this.height * 0.5 + 30);
+
         context.fillText(
-          "Final Score " + this.score + ". Press 'R' to keep saving lifes!",
+          "Final Score " +
+            this.score +
+            ". Press 'R' to keep saving hatchlings!",
           this.width * 0.5,
-          this.height * 0 + 80
+          this.height * 0 + 450
         );
         context.restore();
       }
@@ -633,6 +647,23 @@ window.addEventListener("load", function () {
       this.eggs = this.eggs.filter((e) => !e.markedForDeletion);
       this.hatchlings = this.hatchlings.filter((e) => !e.markedForDeletion);
       this.particles = this.particles.filter((e) => !e.markedForDeletion);
+    }
+    restart() {
+      this.player.restart();
+      this.obstacles = [];
+      this.eggs = [];
+      this.hatchlings = [];
+      this.particles = [];
+      this.enemies = [];
+      this.score = 0;
+      this.lostHatchlings = 0;
+      this.mouse = {
+        x: this.width * 0.5,
+        y: this.height * 0.5,
+        pressed: false,
+      };
+      this.gameOver = false;
+      this.init();
     }
     init() {
       //add enemies
