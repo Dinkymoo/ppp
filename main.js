@@ -514,7 +514,23 @@ window.addEventListener("load", function () {
       this.hatchlings = [];
       //particles
       this.particles = [];
+      this.canvas.addEventListener("touchstart", (e) => {
+        this.mouse.x = e.offsetX;
+        this.mouse.y = e.offsetY;
+        this.mouse.pressed = true;
+      });
+      this.canvas.addEventListener("touchend", (e) => {
+        this.mouse.x = e.offsetX;
+        this.mouse.y = e.offsetY;
+        this.mouse.pressed = false;
+      });
 
+      this.canvas.addEventListener("touchmove", (e) => {
+        if (this.mouse.pressed) {
+          this.mouse.x = e.offsetX;
+          this.mouse.y = e.offsetY;
+        }
+      });
       this.canvas.addEventListener("mousedown", (e) => {
         //inherit ref to this keyword from parent scope
         this.mouse.x = e.offsetX;
