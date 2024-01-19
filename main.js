@@ -634,9 +634,7 @@ window.addEventListener("load", function () {
         context.fillText(message2, this.width * 0.5, this.height * 0.5 + 30);
 
         context.fillText(
-          " You gathered 10g and lost less than half your stash " +
-            this.score +
-            ". Press 'R' to keep saving colas! ",
+          " You gathered 10g and lost less than half your stash. Press 'R' to keep saving colas! ",
           this.width * 0.5,
           this.height * 0 + 450
         );
