@@ -2,7 +2,7 @@ window.addEventListener("load", function () {
   const cvas = this.document.getElementById("canvas1");
   const ctx = cvas.getContext("2d");
   cvas.width = 1280;
-  cvas.height = 720;
+  cvas.height = 1000;
   //frequent changes to canvas state can cause performance issues
   //that is why we do then here
   ctx.fillStyle = "white";
@@ -191,7 +191,7 @@ window.addEventListener("load", function () {
       this.spriteX;
       this.spriteY;
       this.hatchTimer = 0;
-      this.hatchInterval = 3000;
+      this.hatchInterval = 5000;
       this.markedForDeletion = false;
     }
     draw(context) {
@@ -263,8 +263,7 @@ window.addEventListener("load", function () {
       this.height = this.spriteHeight;
       this.collisionX = this.game.width + Math.random() * this.game.width * 0.5; //give each one a random delay
       this.collisionY =
-        this.game.topMargin +
-        Math.random() * (this.game.height - this.game.topMargin);
+        this.game.topMargin + Math.random() * (720 - this.game.topMargin);
       this.spriteX;
       this.spriteY;
       this.frameX = 0;
@@ -387,7 +386,7 @@ window.addEventListener("load", function () {
         if (!this.game.gameOver) this.game.score++;
         for (let i = 0; i < 3; i++) {
           this.game.particles.push(
-            new Firefly(this.game, this.collisionX, this.collisionY, "yellow")
+            new Firefly(this.game, this.collisionX, this.collisionY, "green")
           );
         }
       }
@@ -415,7 +414,7 @@ window.addEventListener("load", function () {
           for (let i = 0; i < 5; i++) {
             //use 5 fpr performance
             this.game.particles.push(
-              new Spark(this.game, this.collisionX, this.collisionY, "blue")
+              new Spark(this.game, this.collisionX, this.collisionY, "red")
             );
           }
         }
@@ -488,7 +487,7 @@ window.addEventListener("load", function () {
       this.fps = 70;
       this.topMargin = 260;
       this.score = 0;
-      this.winningScore = 30;
+      this.winningScore = 10;
       this.lostHatchlings = 0;
       this.mouse = {
         x: this.width * 0.5,
@@ -501,12 +500,12 @@ window.addEventListener("load", function () {
       //obstacles
       this.timer = 0;
       this.interval = 1000 / this.fps;
-      this.numberOfObstacles = 5;
+      this.numberOfObstacles = 4;
       this.obstacles = [];
       //egg
       this.eggTimer = 0;
       this.eggInterval = 1000;
-      this.maxEggs = 29;
+      this.maxEggs = 3;
       this.eggs = [];
       //enemies
       this.enemies = [];
@@ -599,9 +598,7 @@ window.addEventListener("load", function () {
       context.save();
       context.textAlign = "left";
       context.fillText("Score " + this.score, 25, 50);
-      if (this.debug) {
-        context.fillText("Lost " + this.lostHatchlings, 25, 100);
-      }
+      context.fillText("Lost " + this.lostHatchlings, 25, 100);
       context.restore();
       //win/lose message
 
@@ -625,21 +622,21 @@ window.addEventListener("load", function () {
           //lose
           message1 = "Dang!";
           message2 =
-            "You lost " +
+            " You lost " +
             this.lostHatchlings +
-            " hatchlings, don't be a pushover!";
+            " colas, don't be a pushover! ";
         }
 
         context.font = "130px Bangers";
-        context.fillText(message1, this.width * 0.5, this.height * 0.5 - 20);
+        context.fillText(message1, this.width * 0.5, this.height * 0.3);
 
         context.font = "40px Bangers";
         context.fillText(message2, this.width * 0.5, this.height * 0.5 + 30);
 
         context.fillText(
-          "Final Score " +
+          " You gathered 10g and lost less than half your stash " +
             this.score +
-            ". Press 'R' to keep saving hatchlings!",
+            ". Press 'R' to keep saving colas! ",
           this.width * 0.5,
           this.height * 0 + 450
         );

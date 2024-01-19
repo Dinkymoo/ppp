@@ -5,17 +5,22 @@
   font-family: "Bangers", cursive;
 }
 #canvas1 {
-  background: url("background.png");
+  background: url("background.jpg");
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
 }
+#floating-leaves {
+  background: url("background.jpg");
+  position: absolute;
+  top: 50%;
+  left: 50%;
+}
 #overlay {
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
   pointer-events: none;
 }
 #obstacles,
