@@ -2,7 +2,7 @@ window.addEventListener("load", function () {
   const cvas = this.document.getElementById("canvas1");
   const ctx = cvas.getContext("2d");
   cvas.width = 1280;
-  cvas.height = 720;
+  cvas.height = 750;
   //frequent changes to canvas state can cause performance issues
   //that is why we do then here
   ctx.fillStyle = "white";
@@ -124,6 +124,7 @@ window.addEventListener("load", function () {
       this.spriteY = this.collisionY - this.height * 0.5 - 100;
     }
   }
+  
   class Obstacle {
     constructor(game) {
       this.game = game;
@@ -172,6 +173,7 @@ window.addEventListener("load", function () {
       //can possibly add interactive features here
     }
   }
+
   class Eggs {
     constructor(game) {
       this.game = game;
@@ -253,6 +255,7 @@ window.addEventListener("load", function () {
       }
     }
   }
+
   class Enemy {
     constructor(game) {
       this.game = game;
@@ -332,6 +335,7 @@ window.addEventListener("load", function () {
       });
     }
   }
+
   class Larva {
     constructor(game, x, y) {
       this.game = game;
@@ -453,6 +457,7 @@ window.addEventListener("load", function () {
       context.restore();
     }
   }
+
   class Firefly extends Particle {
     update() {
       this.angle += this.va;
@@ -466,6 +471,7 @@ window.addEventListener("load", function () {
       }
     }
   }
+
   class Spark extends Particle {
     update() {
       this.angle += this.va * 0.5;
@@ -599,8 +605,8 @@ window.addEventListener("load", function () {
       //status text
       context.save();
       context.textAlign = "left";
-      context.fillText("Harvest " + this.score * 10 + " grams", 25, 50);
-      context.fillText("Lost " + this.lostHatchlings * 10 + " grams", 25, 100);
+      context.fillText("Score " + this.score, 25, 50);
+      context.fillText("Lost " + this.lostHatchlings, 25, 100);
       context.restore();
       //win/lose message
 
@@ -630,9 +636,9 @@ window.addEventListener("load", function () {
             );
           } else if (this.lostHatchlings < 5) {
             context.fillText(
-              ` You harvested ${this.score * 10}grams and only lost ${
+              ` You saved ${this.score * 10}hatchlings and only lost ${
                 this.lostHatchlings * 10
-              }grams of your stash. Press 'R' to try again! `,
+              } hatchlings. Press 'R' to try again! `,
               this.width * 0.5,
               this.height * 0 + 450
             );
@@ -643,7 +649,7 @@ window.addEventListener("load", function () {
           message2 =
             " You lost " +
             this.lostHatchlings * 10 +
-            "grams, that's more than half of your stash! Don't be a pushover! ";
+            "hatchlings, that's more than half of your hatchlings! Don't be a pushover! ";
         }
 
         context.font = "130px Bangers";

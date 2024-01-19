@@ -6,17 +6,13 @@
   background-color: black;
 }
 #canvas1 {
-  background: url("background.jpg");
+
+ background: url("background.png");
+ background-repeat: no-repeat;
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-}
-#floating-leaves {
-  background: url("background.jpg");
-  position: absolute;
-  top: 50%;
-  left: 50%;
 }
 #overlay {
   position: absolute;
