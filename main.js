@@ -226,6 +226,7 @@ window.addEventListener("load", function () {
       collisionObject.forEach((object) => {
         let [collision, distance, sumOfRadii, dx, dy] =
           this.game.checkCollision(this, object);
+
         if (collision) {
           //between -1 and +1
           const unit_x = dx / distance;
@@ -243,6 +244,7 @@ window.addEventListener("load", function () {
         this.game.hatchlings.push(
           new Larva(this.game, this.collisionX, this.collisionY)
         );
+
         this.markedForDeletion = true;
         this.game.removeGameObjects();
         this.hatchTimer = 0;
@@ -390,6 +392,7 @@ window.addEventListener("load", function () {
           );
         }
       }
+
       //collisions with objects
       let collisionObject = [this.game.player, ...this.game.obstacles];
       collisionObject.forEach((object) => {
@@ -479,7 +482,6 @@ window.addEventListener("load", function () {
   class Game {
     constructor(canvas) {
       this.debug = false;
-
       this.canvas = canvas;
       this.width = canvas.width;
       this.height = canvas.height;
@@ -487,7 +489,7 @@ window.addEventListener("load", function () {
       this.fps = 70;
       this.topMargin = 260;
       this.score = 0;
-      this.winningScore = 10;
+      this.winningScore = 11;
       this.lostHatchlings = 0;
       this.mouse = {
         x: this.width * 0.5,
@@ -612,28 +614,40 @@ window.addEventListener("load", function () {
         context.shadowOffsetX = 4;
         context.shadowOffsetY = 4;
         context.shadowColor = "black";
+
         let message1;
         let message2;
+
         if (this.lostHatchlings <= 5) {
           //win
           message1 = "Bang On!!!";
           message2 = "Who knew you had these skills?";
-          context.fillText(
-            ` You gathered 10g and only lost ${this.lostHatchlings}g of your stash. Press 'R' to keep saving colas! `,
-            this.width * 0.5,
-            this.height * 0 + 450
-          );
+          if (this.lostHatchlings == 0) {
+            context.fillText(
+              ` You harvested ${this.score}g. Press 'R' to keep saving colas! `,
+              this.width * 0.5,
+              this.height * 0 + 450
+            );
+          } else if (this.lostHatchlings < 5) {
+            context.fillText(
+              ` You harvested ${this.score - this.lostHatchlings}g and lost ${
+                this.lostHatchlings
+              }g of your stash. Press 'R' to keep taking care of your harvest! `,
+              this.width * 0.5,
+              this.height * 0 + 450
+            );
+          }
         } else {
           //lose
           message1 = "Dang!";
           message2 =
             " You lost " +
             this.lostHatchlings +
-            " colas, don't be a pushover! ";
+            " colas, that's more than half of your stash! Don't be a pushover! ";
         }
 
         context.font = "130px Bangers";
-        context.fillText(message1, this.width * 0.5, this.height * 0.3);
+        context.fillText(message1, this.width * 0.5, this.height * 0.3 + 10);
 
         context.font = "40px Bangers";
         context.fillText(message2, this.width * 0.5, this.height * 0.5 + 30);
