@@ -614,7 +614,7 @@ window.addEventListener("load", function () {
         context.shadowColor = "black";
         let message1;
         let message2;
-        if (this.lostHatchlings <= 5) {
+        if (this.lostHatchlings < 5) {
           //win
           message1 = "Bang On!!!";
           message2 = "Who knew you had these skills?";
