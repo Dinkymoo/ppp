@@ -614,10 +614,15 @@ window.addEventListener("load", function () {
         context.shadowColor = "black";
         let message1;
         let message2;
-        if (this.lostHatchlings < 5) {
+        if (this.lostHatchlings <= 5) {
           //win
           message1 = "Bang On!!!";
           message2 = "Who knew you had these skills?";
+          context.fillText(
+            ` You gathered 10g and only lost ${this.lostHatchlings}g of your stash. Press 'R' to keep saving colas! `,
+            this.width * 0.5,
+            this.height * 0 + 450
+          );
         } else {
           //lose
           message1 = "Dang!";
@@ -633,11 +638,6 @@ window.addEventListener("load", function () {
         context.font = "40px Bangers";
         context.fillText(message2, this.width * 0.5, this.height * 0.5 + 30);
 
-        context.fillText(
-          " You gathered 10g and lost less than half your stash. Press 'R' to keep saving colas! ",
-          this.width * 0.5,
-          this.height * 0 + 450
-        );
         context.restore();
       }
     }
