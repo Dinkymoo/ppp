@@ -599,8 +599,8 @@ window.addEventListener("load", function () {
       //status text
       context.save();
       context.textAlign = "left";
-      context.fillText("Score " + this.score, 25, 50);
-      context.fillText("Lost " + this.lostHatchlings, 25, 100);
+      context.fillText("Harvest " + this.score * 10 + " grams", 25, 50);
+      context.fillText("Lost " + this.lostHatchlings * 10 + " grams", 25, 100);
       context.restore();
       //win/lose message
 
@@ -624,15 +624,17 @@ window.addEventListener("load", function () {
           message2 = "Who knew you had these skills?";
           if (this.lostHatchlings == 0) {
             context.fillText(
-              ` You harvested ${this.score}g. Press 'R' to keep saving colas! `,
+              ` You harvested ${this.score * 10}grams. Press 'R'to try again!`,
               this.width * 0.5,
               this.height * 0 + 450
             );
           } else if (this.lostHatchlings < 5) {
             context.fillText(
-              ` You harvested ${this.score - this.lostHatchlings}g and lost ${
-                this.lostHatchlings
-              }g of your stash. Press 'R' to keep taking care of your harvest! `,
+              ` You harvested ${
+                (this.score - this.lostHatchlings) * 10
+              }grams and only lost ${
+                this.lostHatchlings * 10
+              }grams of your stash. Press 'R' to try again! `,
               this.width * 0.5,
               this.height * 0 + 450
             );
@@ -642,12 +644,12 @@ window.addEventListener("load", function () {
           message1 = "Dang!";
           message2 =
             " You lost " +
-            this.lostHatchlings +
-            " colas, that's more than half of your stash! Don't be a pushover! ";
+            this.lostHatchlings * 10 +
+            "grams, that's more than half of your stash! Don't be a pushover! ";
         }
 
         context.font = "130px Bangers";
-        context.fillText(message1, this.width * 0.5, this.height * 0.3 + 10);
+        context.fillText(message1, this.width * 0.5, this.height * 0.3 + 30);
 
         context.font = "40px Bangers";
         context.fillText(message2, this.width * 0.5, this.height * 0.5 + 30);
