@@ -10,7 +10,6 @@ window.addEventListener("load", function () {
   ctx.strokeStyle = "black";
   ctx.font = "40px Bangers";
   ctx.textAlign = "center";
-  cvas.removeAttribute("hidden");
 
   class Player {
     constructor(game) {
@@ -631,9 +630,7 @@ window.addEventListener("load", function () {
             );
           } else if (this.lostHatchlings < 5) {
             context.fillText(
-              ` You harvested ${
-                (this.score - this.lostHatchlings) * 10
-              }grams and only lost ${
+              ` You harvested ${this.score * 10}grams and only lost ${
                 this.lostHatchlings * 10
               }grams of your stash. Press 'R' to try again! `,
               this.width * 0.5,
@@ -743,4 +740,5 @@ window.addEventListener("load", function () {
     lastTime = timeStamp;
   }
   animate(0);
+  cvas.removeAttribute("hidden");
 });
