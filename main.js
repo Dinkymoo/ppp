@@ -10,6 +10,7 @@ window.addEventListener("load", function () {
   ctx.strokeStyle = "black";
   ctx.font = "40px Bangers";
   ctx.textAlign = "center";
+  cvas.removeAttribute("hidden");
 
   class Player {
     constructor(game) {
@@ -649,7 +650,7 @@ window.addEventListener("load", function () {
         }
 
         context.font = "130px Bangers";
-        context.fillText(message1, this.width * 0.5, this.height * 0.3 + 30);
+        context.fillText(message1, this.width * 0.5, this.height * 0.3 + 40);
 
         context.font = "40px Bangers";
         context.fillText(message2, this.width * 0.5, this.height * 0.5 + 30);
