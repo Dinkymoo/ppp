@@ -2,7 +2,7 @@ window.addEventListener("load", function () {
   const cvas = this.document.getElementById("canvas1");
   const ctx = cvas.getContext("2d");
   cvas.width = 1280;
-  cvas.height = 1000;
+  cvas.height = 720;
   //frequent changes to canvas state can cause performance issues
   //that is why we do then here
   ctx.fillStyle = "white";
