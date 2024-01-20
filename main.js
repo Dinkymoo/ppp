@@ -740,5 +740,6 @@ window.addEventListener("load", function () {
     lastTime = timeStamp;
   }
   animate(0);
+  this.document.getElementById("spinner").setAttribute("hidden", true);
   cvas.removeAttribute("hidden");
 });
