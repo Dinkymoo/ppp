@@ -630,7 +630,7 @@ window.addEventListener("load", function () {
           message2 = "Who knew you had these skills?";
           if (this.lostHatchlings == 0) {
             context.fillText(
-              ` You harvested ${this.score * 10}grams. Press 'R'to try again!`,
+              ` You saved ${this.score * 10} hatchlings. Press 'R'to try again!`,
               this.width * 0.5,
               this.height * 0 + 450
             );
